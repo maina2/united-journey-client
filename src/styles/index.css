@@ -19,6 +19,10 @@
     @apply bg-[#DA291C] text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors font-semibold;
   }
   
+  .united-btn-outline {
+    @apply border border-[#DA291C] text-[#DA291C] px-6 py-2 rounded-lg hover:bg-[#DA291C] hover:text-white transition-colors font-semibold;
+  }
+  
   .united-card {
     @apply bg-white rounded-xl shadow-md p-6 border border-gray-100;
   }
