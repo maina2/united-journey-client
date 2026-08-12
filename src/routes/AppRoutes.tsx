@@ -3,7 +3,6 @@ import { ProtectedRoute } from './ProtectedRoute'
 import { PublicRoute } from './PublicRoute'
 import { Layout } from '../components/common/Layout'
 
-// Pages
 import { Landing } from '../pages/Landing'
 import { Login } from '../pages/Login'
 import { Register } from '../pages/Register'
@@ -19,14 +18,16 @@ export const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public Routes */}
+        {/* Public Routes with Layout */}
         <Route element={<PublicRoute />}>
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route element={<Layout />}>
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+          </Route>
         </Route>
 
-        {/* Protected Routes */}
+        {/* Protected Routes with Layout */}
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<Dashboard />} />
@@ -39,7 +40,6 @@ export const AppRoutes = () => {
           </Route>
         </Route>
 
-        {/* 404 Fallback */}
         <Route path="*" element={<div className="flex items-center justify-center min-h-screen">Page not found</div>} />
       </Routes>
     </BrowserRouter>

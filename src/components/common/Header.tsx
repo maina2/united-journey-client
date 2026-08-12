@@ -1,7 +1,18 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { Menu, X, User, LogOut, Settings, Award } from 'lucide-react'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { Menu, X, User, LogOut } from 'lucide-react'
 import { useAuthStore } from '../../stores/authStore'
+
+  const navLinks = [
+  { to: '/news', label: 'News' },
+  { to: '/mutv', label: 'MUTV' },
+  { to: '/tickets', label: 'Tickets' },
+  { to: '/store', label: 'United Store' },
+  { to: '/membership', label: 'Membership' },
+  { to: '/dashboard', label: 'My United' },
+  { to: '/teams', label: 'Teams' },
+  { to: '/club', label: 'Club' },
+]
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -14,110 +25,158 @@ export const Header = () => {
   }
 
   return (
-    <header className="bg-[#DA291C] text-white shadow-lg sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <Link to="/dashboard" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
-            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-              <span className="text-[#DA291C] font-bold text-xl">MU</span>
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">My United</h1>
-              <p className="text-xs text-white/80">Journey Hub</p>
-            </div>
-          </Link>
+    <header className="sticky top-0 z-50">
+      {/* Sponsor bar */}
+      <div className="bg-united-black text-united-white">
+        <div className="w-full pl-4 pr-4 md:pl-6 md:pr-6 py-3.5 flex items-center gap-5">
+          <span className="flex items-center gap-2">
+            <AdidasMark className="h-4 w-4" />
+            <span className="text-sm font-bold tracking-wide">adidas</span>
+          </span>
+          <span className="h-4 w-px bg-united-white/30" />
+          <span className="flex items-center gap-2">
+            <SnapdragonMark className="h-4 w-4" />
+            <span className="text-sm font-bold tracking-wide">Snapdragon</span>
+          </span>
+        </div>
+      </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-6">
-            <Link to="/dashboard" className="hover:bg-white/10 px-4 py-2 rounded-lg transition-colors">
-              Dashboard
-            </Link>
-            <Link to="/matches" className="hover:bg-white/10 px-4 py-2 rounded-lg transition-colors">
-              Matches
-            </Link>
-            <Link to="/leaderboards" className="hover:bg-white/10 px-4 py-2 rounded-lg transition-colors">
-              Leaderboard
-            </Link>
-            <Link to="/wrapped" className="hover:bg-white/10 px-4 py-2 rounded-lg transition-colors">
-              Wrapped
-            </Link>
-            <Link to="/cards" className="hover:bg-white/10 px-4 py-2 rounded-lg transition-colors">
-              Cards
-            </Link>
+      {/* Main nav */}
+      <div className="bg-united-white border-b border-united-gray-200 shadow-sm">
+        <div className="w-full pl-4 pr-4 md:pl-6 md:pr-6 py-5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-6">
+              <Link to="/" className="flex items-center hover:opacity-90 transition-opacity">
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg"
+                  alt="Manchester United"
+                  className="h-11 w-11"
+                />
+              </Link>
 
-            <div className="flex items-center gap-3 ml-4 pl-4 border-l border-white/20">
-              {user?.is_admin && (
-                <Link to="/admin" className="text-yellow-300 hover:text-yellow-200">
-                  Admin
+              <button
+                aria-label="Toggle menu"
+                className="hidden md:block text-united-black"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+              >
+                <Menu size={22} />
+              </button>
+
+              <nav className="hidden md:flex items-center gap-7 font-serif text-lg text-united-black">
+                {navLinks.map((link) => (
+                  <NavLink
+                    key={link.to}
+                    to={link.to}
+                    className={({ isActive }) =>
+                      `transition-colors hover:text-united-red ${
+                        isActive ? 'text-united-red font-semibold' : ''
+                      }`
+                    }
+                  >
+                    {link.label}
+                  </NavLink>
+                ))}
+              </nav>
+            </div>
+
+            <div className="flex items-center gap-3">
+              {user ? (
+                <>
+                  {user.is_admin && (
+                    <Link to="/admin" className="hidden md:block text-united-gold-dark hover:text-united-gold text-sm font-medium">
+                      Admin
+                    </Link>
+                  )}
+                  <Link to="/profile" className="flex items-center gap-2 hover:bg-united-gray-100 px-3 py-2 rounded-lg transition-colors">
+                    <div className="w-8 h-8 rounded-full bg-united-red flex items-center justify-center overflow-hidden">
+                      {user.avatar_url ? (
+                        <img src={user.avatar_url} alt={user.username} className="w-full h-full object-cover" />
+                      ) : (
+                        <User size={16} className="text-united-white" />
+                      )}
+                    </div>
+                    <span className="hidden md:block text-sm font-medium text-united-black">{user.username}</span>
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="hidden md:flex hover:bg-united-gray-100 px-3 py-2 rounded-lg transition-colors text-united-black"
+                  >
+                    <LogOut size={18} />
+                  </button>
+                </>
+              ) : (
+                <Link to="/login" className="text-united-black hover:text-united-red transition-colors">
+                  <User size={22} />
                 </Link>
               )}
-              <Link to="/profile" className="flex items-center gap-2 hover:bg-white/10 px-3 py-2 rounded-lg transition-colors">
-                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center overflow-hidden">
-                  {user?.avatar_url ? (
-                    <img src={user.avatar_url} alt={user.username} className="w-full h-full object-cover" />
-                  ) : (
-                    <User size={16} />
-                  )}
-                </div>
-                <span className="text-sm font-medium">{user?.username}</span>
-              </Link>
+
               <button
-                onClick={handleLogout}
-                className="hover:bg-white/10 px-3 py-2 rounded-lg transition-colors"
+                className="md:hidden p-2 hover:bg-united-gray-100 rounded-lg transition-colors text-united-black"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
               >
-                <LogOut size={18} />
+                {isMenuOpen ? <X size={22} /> : <Menu size={22} />}
               </button>
             </div>
-          </nav>
+          </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2 hover:bg-white/10 rounded-lg transition-colors"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          {isMenuOpen && (
+            <nav className="mt-4 pt-4 border-t border-united-gray-200 flex flex-col gap-1 font-serif text-lg">
+              {navLinks.map((link) => (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  className={({ isActive }) =>
+                    `px-4 py-3 rounded-lg hover:bg-united-gray-100 ${
+                      isActive ? 'text-united-red font-semibold' : 'text-united-black'
+                    }`
+                  }
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {link.label}
+                </NavLink>
+              ))}
+              {user ? (
+                <>
+                  <Link to="/profile" className="px-4 py-3 rounded-lg hover:bg-united-gray-100 text-united-black" onClick={() => setIsMenuOpen(false)}>Profile</Link>
+                  {user.is_admin && <Link to="/admin" className="px-4 py-3 rounded-lg hover:bg-united-gray-100 text-united-gold-dark" onClick={() => setIsMenuOpen(false)}>Admin</Link>}
+                  <button onClick={() => { handleLogout(); setIsMenuOpen(false) }} className="px-4 py-3 rounded-lg hover:bg-united-gray-100 text-left text-united-red">
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <Link to="/login" className="px-4 py-3 rounded-lg bg-united-red text-united-white text-center" onClick={() => setIsMenuOpen(false)}>
+                  Sign In
+                </Link>
+              )}
+            </nav>
+          )}
         </div>
-
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <nav className="md:hidden mt-4 pt-4 border-t border-white/20 flex flex-col gap-2">
-            <Link to="/dashboard" className="px-4 py-3 rounded-lg hover:bg-white/10" onClick={() => setIsMenuOpen(false)}>
-              Dashboard
-            </Link>
-            <Link to="/matches" className="px-4 py-3 rounded-lg hover:bg-white/10" onClick={() => setIsMenuOpen(false)}>
-              Matches
-            </Link>
-            <Link to="/leaderboards" className="px-4 py-3 rounded-lg hover:bg-white/10" onClick={() => setIsMenuOpen(false)}>
-              Leaderboard
-            </Link>
-            <Link to="/wrapped" className="px-4 py-3 rounded-lg hover:bg-white/10" onClick={() => setIsMenuOpen(false)}>
-              Wrapped
-            </Link>
-            <Link to="/cards" className="px-4 py-3 rounded-lg hover:bg-white/10" onClick={() => setIsMenuOpen(false)}>
-              Cards
-            </Link>
-            {user?.is_admin && (
-              <Link to="/admin" className="px-4 py-3 rounded-lg hover:bg-white/10 text-yellow-300" onClick={() => setIsMenuOpen(false)}>
-                Admin
-              </Link>
-            )}
-            <Link to="/profile" className="px-4 py-3 rounded-lg hover:bg-white/10" onClick={() => setIsMenuOpen(false)}>
-              Profile
-            </Link>
-            <button
-              onClick={() => {
-                handleLogout()
-                setIsMenuOpen(false)
-              }}
-              className="px-4 py-3 rounded-lg hover:bg-white/10 text-left text-red-200"
-            >
-              Logout
-            </button>
-          </nav>
-        )}
       </div>
     </header>
+  )
+}
+
+function AdidasMark({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <rect x="1" y="15" width="22" height="3" transform="rotate(-14 12 16.5)" />
+      <rect x="1" y="9.5" width="22" height="3" transform="rotate(-14 12 11)" />
+      <rect x="1" y="4" width="22" height="3" transform="rotate(-14 12 5.5)" />
+    </svg>
+  )
+}
+
+function SnapdragonMark({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.6" />
+      <path
+        d="M8 14c1.2 1.6 2.6 2.4 4 2.4 2.6 0 4.6-1.9 4.6-4.4S14.6 7.6 12 7.6c-1.2 0-2.4.6-3.4 1.7"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        fill="none"
+      />
+    </svg>
   )
 }
