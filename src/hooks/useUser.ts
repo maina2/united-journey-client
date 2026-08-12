@@ -16,6 +16,8 @@ export const useUserProfile = () => {
       return response.data
     },
     staleTime: 5 * 60 * 1000,
+    retry: 1,
+    retryDelay: 1000,
   })
 }
 
@@ -27,6 +29,8 @@ export const useUserStats = () => {
       return response.data
     },
     staleTime: 2 * 60 * 1000,
+    retry: 1,
+    retryDelay: 1000,
   })
 }
 
@@ -38,6 +42,8 @@ export const useUserPreferences = () => {
       return response.data
     },
     staleTime: 5 * 60 * 1000,
+    retry: 1,
+    retryDelay: 1000,
   })
 }
 

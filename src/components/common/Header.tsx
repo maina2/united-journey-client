@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { Menu, X, User, LogOut } from 'lucide-react'
+import { Menu, X, User, LogOut, Settings } from 'lucide-react'
 import { useAuthStore } from '../../stores/authStore'
 
-  const navLinks = [
+const navLinks = [
   { to: '/news', label: 'News' },
   { to: '/mutv', label: 'MUTV' },
   { to: '/tickets', label: 'Tickets' },
@@ -83,7 +83,7 @@ export const Header = () => {
               {user ? (
                 <>
                   {user.is_admin && (
-                    <Link to="/admin" className="hidden md:block text-united-gold-dark hover:text-united-gold text-sm font-medium">
+                    <Link to="/admin" className="hidden md:block text-yellow-600 hover:text-yellow-700 text-sm font-medium">
                       Admin
                     </Link>
                   )}
@@ -96,6 +96,12 @@ export const Header = () => {
                       )}
                     </div>
                     <span className="hidden md:block text-sm font-medium text-united-black">{user.username}</span>
+                  </Link>
+                  <Link
+                    to="/preferences"
+                    className="hidden md:flex hover:bg-united-gray-100 px-3 py-2 rounded-lg transition-colors text-united-black"
+                  >
+                    <Settings size={18} />
                   </Link>
                   <button
                     onClick={handleLogout}
@@ -137,9 +143,24 @@ export const Header = () => {
               ))}
               {user ? (
                 <>
-                  <Link to="/profile" className="px-4 py-3 rounded-lg hover:bg-united-gray-100 text-united-black" onClick={() => setIsMenuOpen(false)}>Profile</Link>
-                  {user.is_admin && <Link to="/admin" className="px-4 py-3 rounded-lg hover:bg-united-gray-100 text-united-gold-dark" onClick={() => setIsMenuOpen(false)}>Admin</Link>}
-                  <button onClick={() => { handleLogout(); setIsMenuOpen(false) }} className="px-4 py-3 rounded-lg hover:bg-united-gray-100 text-left text-united-red">
+                  <Link to="/profile" className="px-4 py-3 rounded-lg hover:bg-united-gray-100 text-united-black" onClick={() => setIsMenuOpen(false)}>
+                    Profile
+                  </Link>
+                  <Link to="/preferences" className="px-4 py-3 rounded-lg hover:bg-united-gray-100 text-united-black" onClick={() => setIsMenuOpen(false)}>
+                    Preferences
+                  </Link>
+                  {user.is_admin && (
+                    <Link to="/admin" className="px-4 py-3 rounded-lg hover:bg-united-gray-100 text-yellow-600" onClick={() => setIsMenuOpen(false)}>
+                      Admin
+                    </Link>
+                  )}
+                  <button
+                    onClick={() => {
+                      handleLogout()
+                      setIsMenuOpen(false)
+                    }}
+                    className="px-4 py-3 rounded-lg hover:bg-united-gray-100 text-left text-united-red"
+                  >
                     Logout
                   </button>
                 </>

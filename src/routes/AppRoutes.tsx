@@ -12,6 +12,7 @@ import { Leaderboards } from '../pages/Leaderboards'
 import { Wrapped } from '../pages/Wrapped'
 import { Cards } from '../pages/Cards'
 import { Profile } from '../pages/Profile'
+import { Preferences } from '../pages/Preferences'
 import { Admin } from '../pages/Admin'
 
 export const AppRoutes = () => {
@@ -36,6 +37,7 @@ export const AppRoutes = () => {
             <Route path="/wrapped" element={<Wrapped />} />
             <Route path="/cards" element={<Cards />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/preferences" element={<Preferences />} />
             <Route path="/admin" element={<Admin />} />
           </Route>
         </Route>

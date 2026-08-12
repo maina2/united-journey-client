@@ -1,6 +1,7 @@
 import axios, { AxiosError } from 'axios'
 import type { InternalAxiosRequestConfig } from 'axios'
 import type { ApiError } from '../types/api'
+import { useAuthStore } from '../stores/authStore'
 
 interface CustomRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean
@@ -50,13 +51,11 @@ apiClient.interceptors.response.use(
         
         originalRequest.headers.Authorization = `Bearer ${access_token}`
         return apiClient(originalRequest)
-      } catch {
-        localStorage.removeItem('access_token')
-        localStorage.removeItem('refresh_token')
-        localStorage.removeItem('user')
-        window.location.href = '/login'
-        return Promise.reject(error)
-      }
+} catch {
+  useAuthStore.getState().clear()
+  window.location.href = '/login'
+  return Promise.reject(error)
+}
     }
     
     return Promise.reject(error)

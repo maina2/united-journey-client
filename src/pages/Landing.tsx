@@ -1,4 +1,10 @@
+import { Link } from 'react-router-dom'
+import { ArrowRight } from 'lucide-react'
+import { useAuthStore } from '../stores/authStore'
+
 export const Landing = () => {
+  const { isAuthenticated, user } = useAuthStore()
+
   return (
     <div className="min-h-screen bg-united-white">
       {/* Match Hero */}
@@ -11,6 +17,19 @@ export const Landing = () => {
         <div className="absolute inset-0 bg-gradient-to-t from-united-black/95 via-united-black/30 to-transparent" />
 
         <div className="relative z-10 flex h-full flex-col justify-end px-8 pb-10 md:px-16">
+          {isAuthenticated ? (
+            <div className="mb-6 flex items-center gap-3">
+              <span className="inline-block bg-united-red text-united-white text-sm font-semibold px-4 py-1 rounded-full">
+                Welcome back
+              </span>
+              <span className="font-serif text-2xl text-united-white">{user?.username}</span>
+            </div>
+          ) : (
+            <span className="inline-block w-fit bg-united-red text-united-white text-sm font-semibold px-4 py-1 rounded-full mb-6">
+              Welcome to ManUtd.com
+            </span>
+          )}
+
           <div className="flex flex-col gap-3 mb-6">
             <div className="flex items-center gap-4">
               <img src="/crests/manutd.png" alt="Manchester United" className="h-14 w-14 object-contain" />
@@ -29,8 +48,44 @@ export const Landing = () => {
             <span className="h-1 w-1 rounded-full bg-united-white/60" />
             <span>Croke Park</span>
           </div>
+
+          {isAuthenticated ? (
+            <Link
+              to="/dashboard"
+              className="mt-6 inline-flex w-fit items-center gap-2 rounded-full bg-united-red px-6 py-3 font-semibold text-united-white transition-colors hover:bg-united-red-dark"
+            >
+              Go to My United
+              <ArrowRight size={18} />
+            </Link>
+          ) : (
+            <Link
+              to="/register"
+              className="mt-6 inline-flex w-fit items-center gap-2 rounded-full bg-united-red px-6 py-3 font-semibold text-united-white transition-colors hover:bg-united-red-dark"
+            >
+              Join My United
+              <ArrowRight size={18} />
+            </Link>
+          )}
         </div>
       </section>
+
+      {/* My United teaser strip — only for logged-out visitors */}
+      {!isAuthenticated && (
+        <section className="bg-united-gray-100 px-8 md:px-16 py-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-united-black">
+              Track matches, earn badges, and build your United story with{' '}
+              <span className="font-semibold text-united-red">My United</span>.
+            </p>
+            <Link
+              to="/login"
+              className="text-united-red font-semibold hover:text-united-red-dark transition-colors whitespace-nowrap"
+            >
+              Sign in to get started →
+            </Link>
+          </div>
+        </section>
+      )}
 
       {/* Promo card carousel */}
       <section className="py-8">

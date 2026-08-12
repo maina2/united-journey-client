@@ -121,8 +121,12 @@ export const useAuthStore = create<AuthState>()(
           localStorage.setItem('user', JSON.stringify(user))
           set({ user, isLoading: false })
         } catch (error) {
-          set({ error: 'Failed to load user', isLoading: false })
-          get().clear()
+          // Don't clear auth on load failure - let React Query handle it
+          set({ 
+            error: 'Failed to load user', 
+            isLoading: false 
+          })
+          throw error
         }
       },
 
