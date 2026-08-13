@@ -2,14 +2,16 @@ import { Link } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
 import { useMatchStats, useMatches } from '../hooks/useMatches'
 import { LoadingSpinner } from '../components/common/LoadingSpinner'
+import { BadgesCarousel } from '../components/dashboard/BadgesCarousel'
+import { RankDisplay } from '../components/dashboard/RankDisplay'
 import { formatDistanceToNow } from 'date-fns'
 import {
   TrophyIcon,
   CalendarDaysIcon,
   FireIcon,
   StarIcon,
-
 } from '@heroicons/react/24/solid'
+import { ArrowRightIcon } from '@heroicons/react/24/outline'
 
 const SEASON_MONTHS = ['Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May']
 
@@ -42,7 +44,6 @@ export const Dashboard = () => {
     return <LoadingSpinner />
   }
 
-  // Real stats from backend
   const caps = stats?.total_matches ?? 0
   const wins = stats?.wins ?? 0
   const draws = stats?.draws ?? 0
@@ -131,7 +132,6 @@ export const Dashboard = () => {
             </div>
           </div>
 
-
           <div className="mt-6">
             <div className="relative h-1.5 rounded-full bg-united-white/10">
               <div
@@ -187,6 +187,16 @@ export const Dashboard = () => {
           <RecordCell label="Win Rate" value={`${winRate}%`} valueClass="text-united-red" />
           <RecordCell label="In Person" value={inPerson} valueClass="text-emerald-600" />
           <RecordCell label="Grounds" value={grounds} valueClass="text-united-foil" />
+        </div>
+
+        {/* NEW: Badges & Rank Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <div className="lg:col-span-2">
+            <BadgesCarousel />
+          </div>
+          <div>
+            <RankDisplay />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

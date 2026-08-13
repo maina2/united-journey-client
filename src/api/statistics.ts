@@ -52,6 +52,13 @@ export interface PointsHistoryPoint {
   running_total: number
 }
 
+export interface RankData {
+  global_rank: number | null
+  total_users: number
+  country_rank: number | null
+  country: string | null
+}
+
 export const statisticsApi = {
   getDashboard: () =>
     apiClient.get<DashboardSummary>('/statistics/dashboard'),
@@ -67,4 +74,7 @@ export const statisticsApi = {
 
   getPointsHistory: () =>
     apiClient.get<PointsHistoryPoint[]>('/statistics/points-history'),
+
+  getRank: () =>
+    apiClient.get<RankData>('/statistics/rank'),
 }

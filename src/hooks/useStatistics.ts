@@ -63,3 +63,14 @@ export const usePointsHistory = () => {
     staleTime: 2 * 60 * 1000,
   })
 }
+
+export const useRank = () => {
+  return useQuery({
+    queryKey: ['statistics', 'rank'],
+    queryFn: async () => {
+      const response = await statisticsApi.getRank()
+      return response.data
+    },
+    staleTime: 5 * 60 * 1000,
+  })
+}
