@@ -7,6 +7,7 @@ import { EditMatchModal } from '../components/matches/EditMatchModal'
 import { DeleteConfirmationModal } from '../components/matches/DeleteConfirmationModal'
 import { MatchForm } from '../components/matches/MatchForm'
 import { BulkImport } from '../components/matches/BulkImport'
+import { LiveMatchLogger } from '../components/matches/LiveMatchLogger'
 import type { Match } from '../types'
 
 export const Matches = () => {
@@ -165,6 +166,11 @@ export const Matches = () => {
             <RecordCell label="Win Rate" value={`${stats.win_percentage}%`} valueClass="text-united-black" />
           </div>
         )}
+
+        {/* ---------- Live Match Logger ---------- */}
+        <div className="mb-10">
+          <LiveMatchLogger />
+        </div>
 
         {/* ---------- Filter panel ---------- */}
         <div className="bg-united-parchment rounded-2xl p-5 mb-8">

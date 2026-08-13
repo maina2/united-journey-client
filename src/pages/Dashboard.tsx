@@ -11,7 +11,7 @@ import {
   FireIcon,
   StarIcon,
 } from '@heroicons/react/24/solid'
-import { ArrowRightIcon } from '@heroicons/react/24/outline'
+import { UpcomingMatches } from '../components/dashboard/UpcomingMatches'
 
 const SEASON_MONTHS = ['Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May']
 
@@ -190,14 +190,10 @@ export const Dashboard = () => {
         </div>
 
         {/* NEW: Badges & Rank Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <div className="lg:col-span-2">
-            <BadgesCarousel />
-          </div>
-          <div>
-            <RankDisplay />
-          </div>
-        </div>
+
+        <div className="mb-8">
+  <UpcomingMatches />
+</div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Recent Matches - Real data */}

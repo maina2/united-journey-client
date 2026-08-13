@@ -47,4 +47,40 @@ export const matchesApi = {
       '/matches/bulk', 
       { matches }
     ),
+     getUpcomingWindows: () =>
+    apiClient.get<Array<{
+      id: number
+      match_date: string
+      opponent: string
+      venue: string
+      is_home: boolean
+      competition_id: number
+      season_id: number
+      is_played: boolean
+      window: {
+        status: 'upcoming' | 'open' | 'closed'
+        window_opens_at: string
+        window_closes_at: string
+        time_until: string | null
+        time_remaining: string | null
+      }
+      is_logged: boolean
+      attendance_type: string | null
+    }>>('/matches/upcoming-windows'),
+
+  getWindowStatus: (fixtureId: number) =>
+    apiClient.get<{
+      status: 'upcoming' | 'open' | 'closed'
+      window_opens_at: string
+      window_closes_at: string
+      time_until: string | null
+      time_remaining: string | null
+    }>(`/matches/fixtures/${fixtureId}/window-status`),
+
+  logAttendance: (fixtureId: number, attendance_type: 'in_person' | 'watched', notes?: string) =>
+    apiClient.post<Match>(
+      `/matches/fixtures/${fixtureId}/log-attendance?attendance_type=${attendance_type}${notes ? `&notes=${notes}` : ''}`
+    )
 }
+
+ 

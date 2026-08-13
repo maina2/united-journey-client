@@ -103,3 +103,42 @@ export const useBulkImportMatches = () => {
     },
   })
 }
+
+export const useUpcomingWindows = () => {
+  return useQuery({
+    queryKey: ['matches', 'upcoming-windows'],
+    queryFn: async () => {
+      const response = await matchesApi.getUpcomingWindows()
+      return response.data
+    },
+    staleTime: 30 * 1000, // Refresh every 30 seconds
+    refetchInterval: 30000,
+  })
+}
+
+export const useWindowStatus = (fixtureId: number) => {
+  return useQuery({
+    queryKey: ['matches', 'window-status', fixtureId],
+    queryFn: async () => {
+      const response = await matchesApi.getWindowStatus(fixtureId)
+      return response.data
+    },
+    enabled: !!fixtureId,
+    staleTime: 10 * 1000,
+    refetchInterval: 10000,
+  })
+}
+
+export const useLogAttendance = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ fixtureId, attendance_type, notes }: { fixtureId: number; attendance_type: 'in_person' | 'watched'; notes?: string }) =>
+      matchesApi.logAttendance(fixtureId, attendance_type, notes),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['matches', 'upcoming-windows'] })
+      queryClient.invalidateQueries({ queryKey: matchKeys.all })
+      queryClient.invalidateQueries({ queryKey: matchKeys.stats })
+    },
+  })
+}
