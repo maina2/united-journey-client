@@ -4,6 +4,7 @@ export interface Match {
   match_date: string
   opponent: string
   competition: string
+  competition_id?: number
   score_home: number | null
   score_away: number | null
   result: 'W' | 'D' | 'L' | null
@@ -16,6 +17,7 @@ export interface Match {
   miles_travelled: number | null
   points_earned: number
   season: string | null
+  fixture_id: number | null
   created_at: string
   updated_at: string
 }
@@ -24,6 +26,7 @@ export interface MatchCreate {
   match_date: string
   opponent: string
   competition: string
+  competition_id?: number
   score_home?: number | null
   score_away?: number | null
   venue: string
@@ -34,6 +37,7 @@ export interface MatchCreate {
   photo_url?: string | null
   miles_travelled?: number | null
   season?: string | null
+  fixture_id?: number | null
 }
 
 export interface MatchFilters {
@@ -45,6 +49,8 @@ export interface MatchFilters {
   start_date?: string
   end_date?: string
   search?: string
+  page?: number
+  limit?: number
 }
 
 export interface Fixture {
@@ -58,4 +64,7 @@ export interface Fixture {
   season_id: number
   season_name: string
   is_played: boolean
+  score_home?: number
+  score_away?: number
+  result?: string
 }

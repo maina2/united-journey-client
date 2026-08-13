@@ -18,6 +18,17 @@
   --color-united-gold: #FBE122;
   --color-united-gold-dark: #C9A400;
 
+  /* Muted plaque/foil gold — for the member card & honours board,
+     distinct from the bright crest gold above */
+  --color-united-foil: #C9A227;
+
+  /* Turf green — wins / on-record energy */
+  --color-united-pitch: #0C3B2E;
+  --color-united-pitch-light: #14573F;
+
+  /* Programme-paper cream — held in reserve, not used in the current dashboard */
+  --color-united-parchment: #F3EEE3;
+
   /* Base */
   --color-united-white: #FFFFFF;
 }

@@ -1,14 +1,13 @@
 import axios, { AxiosError } from 'axios'
 import type { InternalAxiosRequestConfig } from 'axios'
 import type { ApiError } from '../types/api'
-import { useAuthStore } from '../stores/authStore'
 
 interface CustomRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean
 }
 
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/v1',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -41,7 +40,7 @@ apiClient.interceptors.response.use(
         }
         
         const response = await axios.post(
-          `${import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'}/auth/refresh`,
+          `${import.meta.env.VITE_API_URL || 'http://localhost:8000/v1'}/auth/refresh`,
           { refresh_token: refreshToken }
         )
         
@@ -51,11 +50,13 @@ apiClient.interceptors.response.use(
         
         originalRequest.headers.Authorization = `Bearer ${access_token}`
         return apiClient(originalRequest)
-} catch {
-  useAuthStore.getState().clear()
-  window.location.href = '/login'
-  return Promise.reject(error)
-}
+      } catch {
+        localStorage.removeItem('access_token')
+        localStorage.removeItem('refresh_token')
+        localStorage.removeItem('user')
+        window.location.href = '/login'
+        return Promise.reject(error)
+      }
     }
     
     return Promise.reject(error)

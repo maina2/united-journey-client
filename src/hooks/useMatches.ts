@@ -91,3 +91,15 @@ export const useDeleteMatch = () => {
     },
   })
 }
+
+export const useBulkImportMatches = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (matches: MatchCreate[]) => matchesApi.bulkImport(matches),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: matchKeys.all })
+      queryClient.invalidateQueries({ queryKey: matchKeys.stats })
+    },
+  })
+}

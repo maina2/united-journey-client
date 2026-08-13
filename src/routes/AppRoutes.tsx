@@ -12,17 +12,22 @@ import { Leaderboards } from '../pages/Leaderboards'
 import { Wrapped } from '../pages/Wrapped'
 import { Cards } from '../pages/Cards'
 import { Profile } from '../pages/Profile'
-import { Preferences } from '../pages/Preferences'
 import { Admin } from '../pages/Admin'
+import { Statistics } from '../pages/Statistics'
 
 export const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public Routes with Layout */}
+        {/* Shared route: accessible whether logged in or not.
+            Landing itself decides what to render based on auth state. */}
+        <Route element={<Layout />}>
+          <Route path="/" element={<Landing />} />
+        </Route>
+
+        {/* Public-only Routes (redirect away if already authenticated) */}
         <Route element={<PublicRoute />}>
           <Route element={<Layout />}>
-            <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
           </Route>
@@ -37,8 +42,9 @@ export const AppRoutes = () => {
             <Route path="/wrapped" element={<Wrapped />} />
             <Route path="/cards" element={<Cards />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/preferences" element={<Preferences />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/statistics" element={<Statistics />} />
+
           </Route>
         </Route>
 
