@@ -4,6 +4,7 @@ import { useMatchStats, useMatches } from '../hooks/useMatches'
 import { LoadingSpinner } from '../components/common/LoadingSpinner'
 import { BadgesCarousel } from '../components/dashboard/BadgesCarousel'
 import { RankDisplay } from '../components/dashboard/RankDisplay'
+import { UpcomingMatches } from '../components/dashboard/UpcomingMatches'
 import { formatDistanceToNow } from 'date-fns'
 import {
   TrophyIcon,
@@ -11,7 +12,6 @@ import {
   FireIcon,
   StarIcon,
 } from '@heroicons/react/24/solid'
-import { UpcomingMatches } from '../components/dashboard/UpcomingMatches'
 
 const SEASON_MONTHS = ['Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May']
 
@@ -175,7 +175,7 @@ export const Dashboard = () => {
           </Link>
         </div>
 
-        {/* Stats Cards - Real data from backend */}
+        {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <StatCardSmall label="Matches" value={caps} icon={<CalendarDaysIcon className="w-5 h-5 text-united-red" />} />
           <StatCardSmall label="Wins" value={wins} icon={<TrophyIcon className="w-5 h-5 text-emerald-500" />} />
@@ -189,14 +189,23 @@ export const Dashboard = () => {
           <RecordCell label="Grounds" value={grounds} valueClass="text-united-foil" />
         </div>
 
-        {/* NEW: Badges & Rank Row */}
+        {/* ===== BADGES & RANK ROW - NOW VISIBLE ===== */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <div className="lg:col-span-2">
+            <BadgesCarousel />
+          </div>
+          <div>
+            <RankDisplay />
+          </div>
+        </div>
 
+        {/* Upcoming Matches */}
         <div className="mb-8">
-  <UpcomingMatches />
-</div>
+          <UpcomingMatches />
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Recent Matches - Real data */}
+          {/* Recent Matches */}
           <div className="lg:col-span-2 rounded-2xl border border-united-gray-200 bg-united-white p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-serif text-xl text-united-black">Recent Appearances</h2>

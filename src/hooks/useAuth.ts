@@ -10,14 +10,26 @@ export const authKeys = {
 }
 
 export const useUser = () => {
+  // Subscribing via the hook (not useAuthStore.getState()) means `enabled`
+  // re-evaluates whenever isAuthenticated actually changes — e.g. right
+  // after clear() runs — instead of staying frozen at whatever it was on
+  // this component's first render.
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
   return useQuery({
     queryKey: authKeys.user,
     queryFn: async () => {
       const response = await usersApi.getMe()
       return response.data
     },
-    enabled: useAuthStore.getState().isAuthenticated,
+    enabled: isAuthenticated,
     staleTime: 5 * 60 * 1000,
+    // 401s mean the session is invalid, not that the request should be
+    // retried — retrying just re-triggers the refresh flow N more times.
+    retry: (failureCount, error: any) => {
+      if (error?.response?.status === 401) return false
+      return failureCount < 2
+    },
   })
 }
 
@@ -55,13 +67,19 @@ export const useLogout = () => {
 }
 
 export const useSessions = () => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
   return useQuery({
     queryKey: authKeys.sessions,
     queryFn: async () => {
       const response = await authApi.getSessions()
       return response.data
     },
-    enabled: useAuthStore.getState().isAuthenticated,
+    enabled: isAuthenticated,
+    retry: (failureCount, error: any) => {
+      if (error?.response?.status === 401) return false
+      return failureCount < 2
+    },
   })
 }
 

@@ -35,17 +35,17 @@ export const useAuthStore = create<AuthState>()(
       login: async (email, password, deviceName, deviceType) => {
         set({ isLoading: true, error: null })
         try {
-          const response = await authApi.login({ 
-            email, 
-            password, 
+          const response = await authApi.login({
+            email,
+            password,
             device_name: deviceName || 'Web Browser',
             device_type: deviceType || 'Web',
           })
           const data = response.data
-          
+
           localStorage.setItem('access_token', data.access_token)
           localStorage.setItem('refresh_token', data.refresh_token)
-          
+
           set({
             accessToken: data.access_token,
             refreshToken: data.refresh_token,
@@ -103,7 +103,7 @@ export const useAuthStore = create<AuthState>()(
           get().clear()
           return
         }
-        
+
         try {
           const response = await authApi.refresh(refreshToken)
           const data = response.data
@@ -121,11 +121,11 @@ export const useAuthStore = create<AuthState>()(
           localStorage.setItem('user', JSON.stringify(user))
           set({ user, isLoading: false })
         } catch (error) {
-          // Don't clear auth on load failure - let React Query handle it
-          set({ 
-            error: 'Failed to load user', 
-            isLoading: false 
-          })
+          // A failed loadUser means the tokens we have don't actually work —
+          // there is no valid session to keep around. Clearing here is the
+          // only place that guarantees isAuthenticated flips back to false;
+          // nothing else in the app does this on our behalf.
+          get().clear()
           throw error
         }
       },

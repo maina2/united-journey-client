@@ -14,6 +14,7 @@ import { Cards } from '../pages/Cards'
 import { Profile } from '../pages/Profile'
 import { Admin } from '../pages/Admin'
 import { Statistics } from '../pages/Statistics'
+import { Badges } from '../pages/Badges'
 
 export const AppRoutes = () => {
   return (
@@ -44,7 +45,7 @@ export const AppRoutes = () => {
             <Route path="/profile" element={<Profile />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/statistics" element={<Statistics />} />
-
+            <Route path="/badges" element={<Badges />} />
           </Route>
         </Route>
 

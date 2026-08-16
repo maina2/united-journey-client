@@ -57,7 +57,14 @@ export const useAvailableBadges = () => {
     queryKey: badgeKeys.available,
     queryFn: async () => {
       const response = await apiClient.get<AvailableBadge[]>('/badges/available')
-      return response.data
+      // Ensure progress_percentage is a number
+      const data = response.data || []
+      return data.map((badge: any) => ({
+        ...badge,
+        progress_percentage: badge.progress_percentage || 0,
+        progress: badge.progress || {},
+        requirements: badge.requirements || {},
+      }))
     },
     staleTime: 5 * 60 * 1000,
   })

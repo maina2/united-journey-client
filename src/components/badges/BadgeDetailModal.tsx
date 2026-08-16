@@ -1,4 +1,4 @@
-import { X, Lock, CheckCircle, TrendingUp, Trophy, Users, Flame, MapPin, Star } from 'lucide-react'
+import { X, Lock, CheckCircle, TrendingUp, Trophy, Flame, MapPin, Star } from 'lucide-react'
 import type { AvailableBadge } from '../../types'
 
 interface BadgeDetailModalProps {
@@ -64,20 +64,20 @@ export const BadgeDetailModal = ({ badge, onClose }: BadgeDetailModalProps) => {
     badge.requirements.points_required
 
   return (
-    <div className="fixed inset-0 bg-united-black/60 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-united-black/80 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
       <div 
-        className="bg-united-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-in fade-in zoom-in duration-300"
+        className="bg-united-charcoal rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-united-white/10"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="relative px-6 pt-6 pb-4 border-b border-united-gray-100 flex items-start justify-between">
+        <div className="relative px-6 pt-6 pb-4 border-b border-united-white/10 flex items-start justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-united-gray-50 flex items-center justify-center text-4xl border-2 border-united-red/10">
+            <div className="w-16 h-16 rounded-full bg-united-white/5 flex items-center justify-center text-4xl border border-united-white/10">
               {badge.icon_url || '🏅'}
             </div>
             <div>
-              <h3 className="font-serif text-xl font-bold text-united-black">{badge.name}</h3>
-              <p className="text-xs text-united-gray-500 flex items-center gap-1">
+              <h3 className="font-serif text-xl font-bold text-united-white">{badge.name}</h3>
+              <p className="text-xs text-united-white/40 flex items-center gap-1">
                 {getCategoryIcon(badge.category)}
                 <span className="capitalize">{badge.category}</span>
               </p>
@@ -85,9 +85,9 @@ export const BadgeDetailModal = ({ badge, onClose }: BadgeDetailModalProps) => {
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 hover:bg-united-gray-100 rounded-lg transition-colors"
+            className="p-1.5 hover:bg-united-white/10 rounded-lg transition-colors text-united-white/40 hover:text-united-white"
           >
-            <X className="w-5 h-5 text-united-gray-500" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
@@ -96,12 +96,12 @@ export const BadgeDetailModal = ({ badge, onClose }: BadgeDetailModalProps) => {
           {/* Status Badge */}
           <div className="flex items-center gap-2">
             {badge.is_earned ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/20">
                 <CheckCircle className="w-3.5 h-3.5" />
                 Earned
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-united-gray-100 text-united-gray-600">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-united-white/5 text-united-white/40 border border-united-white/10">
                 <Lock className="w-3.5 h-3.5" />
                 Locked
               </span>
@@ -110,7 +110,7 @@ export const BadgeDetailModal = ({ badge, onClose }: BadgeDetailModalProps) => {
               {badge.category}
             </span>
             {badge.progress_percentage > 0 && !badge.is_earned && (
-              <span className="text-xs font-medium text-united-gray-500">
+              <span className="text-xs font-medium text-united-white/40">
                 {Math.round(badge.progress_percentage)}% complete
               </span>
             )}
@@ -118,13 +118,13 @@ export const BadgeDetailModal = ({ badge, onClose }: BadgeDetailModalProps) => {
 
           {/* Description */}
           <div>
-            <p className="text-sm text-united-gray-700">{badge.description}</p>
+            <p className="text-sm text-united-white/70">{badge.description}</p>
           </div>
 
           {/* Requirements */}
           {hasRequirements && (
             <div className="space-y-3">
-              <h4 className="text-sm font-semibold text-united-black">Requirements</h4>
+              <h4 className="text-sm font-semibold text-united-white">Requirements</h4>
               <div className="space-y-2">
                 {badge.requirements.matches_required && (
                   <ProgressBar
@@ -166,8 +166,8 @@ export const BadgeDetailModal = ({ badge, onClose }: BadgeDetailModalProps) => {
           )}
 
           {badge.is_earned && badge.earned_at && (
-            <div className="pt-3 border-t border-united-gray-100">
-              <p className="text-xs text-united-gray-500">
+            <div className="pt-3 border-t border-united-white/10">
+              <p className="text-xs text-united-white/40">
                 Earned on {new Date(badge.earned_at).toLocaleDateString('en-GB', {
                   day: 'numeric',
                   month: 'long',
