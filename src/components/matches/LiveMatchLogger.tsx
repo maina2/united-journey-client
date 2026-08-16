@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react'
-import { Calendar, MapPin, Clock, Users, Camera, Loader2, CheckCircle, AlertCircle } from 'lucide-react'
+import { useState, useEffect, useMemo } from 'react'
 import { useUpcomingWindows, useLogAttendance } from '../../hooks/useMatches'
-import { format, formatDistanceToNowStrict } from 'date-fns'
+import { format } from 'date-fns'
 
 export const LiveMatchLogger = () => {
   const { data: fixtures, isLoading, refetch } = useUpcomingWindows()
@@ -10,17 +9,10 @@ export const LiveMatchLogger = () => {
   const [notes, setNotes] = useState('')
   const [selectedFixture, setSelectedFixture] = useState<any>(null)
 
-  // Get only matches that are currently open
-  const liveMatches = fixtures?.filter((f: any) => 
-    f.window?.status === 'open' && !f.is_logged
-  ) || []
-
-  const upcomingMatches = fixtures?.filter((f: any) => 
-    f.window?.status === 'upcoming'
-  ) || []
+  const liveMatches = fixtures?.filter((f: any) => f.window?.status === 'open' && !f.is_logged) || []
+  const upcomingMatches = fixtures?.filter((f: any) => f.window?.status === 'upcoming') || []
 
   useEffect(() => {
-    // Auto-refresh every 10 seconds
     const interval = setInterval(() => {
       refetch()
     }, 10000)
@@ -30,10 +22,10 @@ export const LiveMatchLogger = () => {
   const handleLogAttendance = async (fixtureId: number, attendanceType: 'in_person' | 'watched') => {
     setLoggingId(fixtureId)
     try {
-      await logAttendance.mutateAsync({ 
-        fixtureId, 
+      await logAttendance.mutateAsync({
+        fixtureId,
         attendance_type: attendanceType,
-        notes: notes || undefined 
+        notes: notes || undefined,
       })
       setNotes('')
       setSelectedFixture(null)
@@ -48,147 +40,130 @@ export const LiveMatchLogger = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-6 h-6 animate-spin text-united-red" />
+        <span className="h-5 w-5 rounded-full border-2 border-united-gray-300 border-t-united-red animate-spin" />
       </div>
     )
   }
 
   if (liveMatches.length === 0 && upcomingMatches.length === 0) {
     return (
-      <div className="bg-united-white rounded-2xl p-8 border border-united-gray-200 text-center">
-        <div className="w-16 h-16 bg-united-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Calendar className="w-8 h-8 text-united-gray-400" />
-        </div>
-        <h3 className="font-serif text-xl text-united-black mb-2">No Live Matches</h3>
-        <p className="text-united-gray-500 text-sm">
-          Check back during match time to log your attendance.
-        </p>
-        {upcomingMatches.length > 0 && (
-          <div className="mt-4 text-sm text-united-gray-400">
-            {upcomingMatches.length} upcoming matches scheduled
-          </div>
-        )}
+      <div className="rounded-2xl border border-united-gray-200 bg-united-white p-8 text-center">
+        <p className="font-serif text-lg text-united-black mb-1">No live matches right now.</p>
+        <p className="text-sm text-united-gray-600">Check back once a match kicks off.</p>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      {/* Live Matches */}
+    <div className="space-y-8">
+      {/* Live matches */}
       {liveMatches.length > 0 && (
         <div>
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-2 h-2 rounded-full bg-united-red animate-pulse" />
+          <div className="flex items-center gap-2.5 mb-4">
+            <span className="h-2 w-2 rounded-full bg-united-red animate-pulse" />
             <h2 className="font-serif text-xl text-united-black">Live Now</h2>
-            <span className="text-sm text-united-gray-500">({liveMatches.length} match{liveMatches.length > 1 ? 'es' : ''})</span>
+            <span className="text-sm text-united-gray-600">
+              ({liveMatches.length} match{liveMatches.length > 1 ? 'es' : ''})
+            </span>
           </div>
 
-          <div className="grid grid-cols-1 gap-4">
+          <div className="space-y-4">
             {liveMatches.map((fixture: any) => {
               const matchDate = new Date(fixture.match_date)
               const isSelected = selectedFixture?.id === fixture.id
+              const isPending = logAttendance.isPending && loggingId === fixture.id
 
               return (
                 <div
                   key={fixture.id}
-                  className={`bg-gradient-to-r from-united-red/5 to-white rounded-2xl border-2 ${
-                    isSelected ? 'border-united-red' : 'border-united-red/20'
-                  } p-6 transition-all`}
+                  className={`flex gap-4 rounded-2xl border bg-united-white p-6 transition-colors ${
+                    isSelected ? 'border-united-red' : 'border-united-gray-200'
+                  }`}
                 >
-                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 flex-wrap">
-                        <span className="text-lg font-bold text-united-black">
-                          vs {fixture.opponent}
-                        </span>
-                        <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${
-                          fixture.is_home
-                            ? 'bg-united-red/10 text-united-red'
-                            : 'bg-united-gray-200 text-united-gray-600'
-                        }`}>
-                          {fixture.is_home ? '🏠 Home' : '✈️ Away'}
-                        </span>
-                        <span className="text-xs px-2.5 py-1 rounded-full bg-united-red/10 text-united-red font-medium animate-pulse">
-                          🔴 Live
-                        </span>
-                      </div>
+                  <div className="w-1 shrink-0 rounded-full bg-united-red" />
 
-                      <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-united-gray-500">
-                        <span className="flex items-center gap-1.5">
-                          <Calendar className="w-4 h-4" />
-                          {format(matchDate, 'EEEE, dd MMM yyyy')}
-                        </span>
-                        <span className="flex items-center gap-1.5">
-                          <Clock className="w-4 h-4" />
-                          {format(matchDate, 'HH:mm')}
-                        </span>
-                        <span className="flex items-center gap-1.5">
-                          <MapPin className="w-4 h-4" />
-                          {fixture.venue}
-                        </span>
-                      </div>
-
-                      <div className="mt-3 flex items-center gap-2 text-sm text-united-red font-medium">
-                        <Clock className="w-4 h-4" />
-                        <span>Logging window closes in </span>
-                        <span className="font-mono">
-                          {fixture.window?.time_remaining ? (
-                            formatDistanceToNowStrict(
-                              new Date(Date.now() + parseTimeRemaining(fixture.window.time_remaining)),
-                              { unit: 'second' }
-                            )
-                          ) : (
-                            '--:--:--'
-                          )}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex-shrink-0">
-                      {!isSelected ? (
-                        <button
-                          onClick={() => setSelectedFixture(fixture)}
-                          className="w-full lg:w-auto px-6 py-2.5 bg-united-red text-white rounded-xl font-semibold hover:bg-red-700 transition-colors"
-                        >
-                          Log Attendance →
-                        </button>
-                      ) : (
-                        <div className="space-y-3 w-full lg:w-64">
-                          <textarea
-                            placeholder="Add personal notes..."
-                            value={notes}
-                            onChange={(e) => setNotes(e.target.value)}
-                            className="w-full px-3 py-2 border border-united-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-united-red/20 focus:border-united-red outline-none resize-none"
-                            rows={2}
-                          />
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => handleLogAttendance(fixture.id, 'in_person')}
-                              disabled={logAttendance.isPending && loggingId === fixture.id}
-                              className="flex-1 bg-united-red text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-1"
-                            >
-                              {logAttendance.isPending && loggingId === fixture.id ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                              ) : (
-                                '🏟️ In Person'
-                              )}
-                            </button>
-                            <button
-                              onClick={() => handleLogAttendance(fixture.id, 'watched')}
-                              disabled={logAttendance.isPending && loggingId === fixture.id}
-                              className="flex-1 bg-united-gray-200 text-united-black px-4 py-2 rounded-lg text-sm font-semibold hover:bg-united-gray-300 transition-colors disabled:opacity-50"
-                            >
-                              📺 Watched
-                            </button>
-                            <button
-                              onClick={() => setSelectedFixture(null)}
-                              className="px-3 py-2 text-united-gray-400 hover:text-united-gray-600"
-                            >
-                              ✕
-                            </button>
-                          </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2.5 flex-wrap">
+                          <span className="font-serif text-lg text-united-black">vs {fixture.opponent}</span>
+                          <span
+                            className={`text-[10px] font-bold tracking-[0.1em] uppercase px-2 py-0.5 rounded-sm ${
+                              fixture.is_home
+                                ? 'bg-united-red/10 text-united-red'
+                                : 'bg-united-gray-100 text-united-gray-600'
+                            }`}
+                          >
+                            {fixture.is_home ? 'Home' : 'Away'}
+                          </span>
+                          <span className="inline-flex items-center gap-1.5 text-[10px] font-bold tracking-[0.1em] uppercase text-united-red">
+                            <span className="h-1.5 w-1.5 rounded-full bg-united-red animate-pulse" />
+                            Live
+                          </span>
                         </div>
-                      )}
+
+                        <p className="mt-1.5 text-sm text-united-gray-600 font-mono">
+                          {format(matchDate, 'EEE, dd MMM yyyy')}
+                          <span className="mx-1.5 text-united-gray-200">&middot;</span>
+                          {format(matchDate, 'HH:mm')}
+                          <span className="mx-1.5 text-united-gray-200">&middot;</span>
+                          <span className="font-sans">{fixture.venue}</span>
+                        </p>
+
+                        <div className="mt-3 flex items-center gap-2">
+                          <span className="text-xs text-united-gray-600">Logging window closes in</span>
+                          <LiveCountdown durationRaw={fixture.window?.time_remaining} />
+                        </div>
+                      </div>
+
+                      <div className="shrink-0">
+                        {!isSelected ? (
+                          <button
+                            onClick={() => setSelectedFixture(fixture)}
+                            className="w-full lg:w-auto inline-flex items-center gap-2 rounded-md bg-united-red px-5 py-2.5 font-semibold text-united-white transition-colors hover:bg-united-red-dark"
+                          >
+                            Log Attendance
+                            <ArrowRightIcon className="h-4 w-4" />
+                          </button>
+                        ) : (
+                          <div className="space-y-3 w-full lg:w-64">
+                            <textarea
+                              placeholder="Add personal notes..."
+                              value={notes}
+                              onChange={(e) => setNotes(e.target.value)}
+                              rows={2}
+                              className="w-full px-3 py-2 border border-united-gray-200 rounded-md text-sm focus:outline-none focus:border-united-red resize-none"
+                            />
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleLogAttendance(fixture.id, 'in_person')}
+                                disabled={isPending}
+                                className="flex-1 inline-flex items-center justify-center gap-2 rounded-md bg-united-red px-3 py-2 text-sm font-semibold text-united-white transition-colors hover:bg-united-red-dark disabled:opacity-50"
+                              >
+                                {isPending ? (
+                                  <span className="h-3.5 w-3.5 rounded-full border-2 border-white/40 border-t-white animate-spin" />
+                                ) : (
+                                  'In the Ground'
+                                )}
+                              </button>
+                              <button
+                                onClick={() => handleLogAttendance(fixture.id, 'watched')}
+                                disabled={isPending}
+                                className="flex-1 rounded-md border border-united-gray-200 px-3 py-2 text-sm font-semibold text-united-black transition-colors hover:bg-united-gray-100 disabled:opacity-50"
+                              >
+                                Watched
+                              </button>
+                              <button
+                                onClick={() => setSelectedFixture(null)}
+                                aria-label="Cancel"
+                                className="px-2 text-united-gray-600 hover:text-united-black transition-colors"
+                              >
+                                <XIcon className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -198,26 +173,25 @@ export const LiveMatchLogger = () => {
         </div>
       )}
 
-      {/* Upcoming Matches (Preview) */}
+      {/* Upcoming preview */}
       {upcomingMatches.length > 0 && (
-        <div className="mt-8">
-          <h3 className="font-serif text-lg text-united-black mb-3 flex items-center gap-2">
-            <Clock className="w-4 h-4 text-united-gray-400" />
+        <div>
+          <h3 className="font-serif text-lg text-united-black mb-3">
             Upcoming Matches
-            <span className="text-sm font-normal text-united-gray-400">({upcomingMatches.length})</span>
+            <span className="ml-2 text-sm font-sans font-normal text-united-gray-600">
+              ({upcomingMatches.length})
+            </span>
           </h3>
-          <div className="space-y-2">
+          <div className="border border-united-gray-200 rounded-2xl divide-y divide-united-gray-200">
             {upcomingMatches.slice(0, 3).map((fixture: any) => (
-              <div key={fixture.id} className="flex items-center justify-between p-3 bg-united-gray-50 rounded-xl border border-united-gray-100">
+              <div key={fixture.id} className="flex items-center justify-between px-5 py-3">
                 <div className="flex items-center gap-3">
                   <span className="text-sm font-medium text-united-black">vs {fixture.opponent}</span>
-                  <span className="text-xs text-united-gray-500">
+                  <span className="text-xs text-united-gray-600 font-mono">
                     {format(new Date(fixture.match_date), 'dd MMM, HH:mm')}
                   </span>
                 </div>
-                <span className="text-xs text-united-gray-400">
-                  Opens at match time
-                </span>
+                <span className="text-xs text-united-gray-600">Logging opens at kickoff</span>
               </div>
             ))}
           </div>
@@ -227,14 +201,88 @@ export const LiveMatchLogger = () => {
   )
 }
 
-function parseTimeRemaining(timeStr: string): number {
-  if (!timeStr) return 0
-  const parts = timeStr.split(':')
+/* ---------- Live countdown (target-timestamp pattern) ---------- */
+
+function parseDurationToMs(timeStr: string | undefined | null): number | null {
+  if (!timeStr) return null
+  const parts = timeStr.split(':').map((p) => parseFloat(p))
+  if (parts.some((p) => Number.isNaN(p))) return null
+
+  let seconds = 0
   if (parts.length === 3) {
-    const hours = parseInt(parts[0]) || 0
-    const minutes = parseInt(parts[1]) || 0
-    const seconds = parseFloat(parts[2]) || 0
-    return (hours * 3600 + minutes * 60 + seconds) * 1000
+    const [h, m, s] = parts
+    seconds = h * 3600 + m * 60 + s
+  } else if (parts.length === 4) {
+    const [d, h, m, s] = parts
+    seconds = d * 86400 + h * 3600 + m * 60 + s
+  } else {
+    return null
   }
-  return 0
+  return seconds * 1000
+}
+
+function pad(n: number): string {
+  return String(Math.max(0, n)).padStart(2, '0')
+}
+
+function formatMs(ms: number): string {
+  if (ms <= 0) return '00:00:00'
+  const totalSeconds = Math.floor(ms / 1000)
+  const hours = Math.floor(totalSeconds / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+  const seconds = totalSeconds % 60
+  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
+}
+
+function LiveCountdown({ durationRaw }: { durationRaw: string | undefined }) {
+  // Fixed once per snapshot from the API, then ticks down locally every second —
+  // real wall-clock counting, independent of parent re-renders or the 10s refetch.
+  const targetTimestamp = useMemo(() => {
+    const ms = parseDurationToMs(durationRaw)
+    return ms !== null ? Date.now() + ms : null
+  }, [durationRaw])
+
+  const [remaining, setRemaining] = useState<number | null>(
+    targetTimestamp !== null ? targetTimestamp - Date.now() : null
+  )
+
+  useEffect(() => {
+    if (targetTimestamp === null) {
+      setRemaining(null)
+      return
+    }
+    setRemaining(targetTimestamp - Date.now())
+    const id = setInterval(() => {
+      setRemaining(Math.max(0, targetTimestamp - Date.now()))
+    }, 1000)
+    return () => clearInterval(id)
+  }, [targetTimestamp])
+
+  if (remaining === null) {
+    return <span className="text-xs text-united-gray-600">&mdash;</span>
+  }
+
+  return (
+    <span className="font-mono tabular-nums text-sm font-bold text-united-red border border-united-red/30 bg-united-red/5 rounded-md px-2 py-0.5">
+      {formatMs(remaining)}
+    </span>
+  )
+}
+
+/* ---------- Minimal functional icons ---------- */
+
+function ArrowRightIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function XIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  )
 }

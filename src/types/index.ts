@@ -1,5 +1,12 @@
-
-
+export type { ApiResponse, PaginatedResponse, ApiError } from './api'
+export type {
+  User,
+  UserStats,
+  LoginRequest,
+  RegisterRequest,
+  TokenResponse,
+  Session,
+} from './auth'
 export type {
   UserPreferences,
   UserUpdate,
@@ -11,3 +18,8 @@ export type {
   MatchFilters,
   Fixture,
 } from './match'
+export type {
+  Badge,
+  AvailableBadge,
+  BadgeProgress,
+} from './badge'
