@@ -20,13 +20,12 @@ export const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Shared route: accessible whether logged in or not.
-            Landing itself decides what to render based on auth state. */}
+        {/* Shared route */}
         <Route element={<Layout />}>
           <Route path="/" element={<Landing />} />
         </Route>
 
-        {/* Public-only Routes (redirect away if already authenticated) */}
+        {/* Public-only Routes */}
         <Route element={<PublicRoute />}>
           <Route element={<Layout />}>
             <Route path="/login" element={<Login />} />
@@ -34,7 +33,7 @@ export const AppRoutes = () => {
           </Route>
         </Route>
 
-        {/* Protected Routes with Layout */}
+        {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<Dashboard />} />
@@ -49,6 +48,7 @@ export const AppRoutes = () => {
           </Route>
         </Route>
 
+        {/* 404 Fallback */}
         <Route path="*" element={<div className="flex items-center justify-center min-h-screen">Page not found</div>} />
       </Routes>
     </BrowserRouter>

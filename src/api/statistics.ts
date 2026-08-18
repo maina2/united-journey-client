@@ -18,6 +18,7 @@ export interface DashboardSummary {
   total_points: number
   miles_travelled: number
   competition_breakdown: Array<{ competition: string; count: number }>
+  badges_count: number  // ADDED
 }
 
 export interface SeasonBreakdown {

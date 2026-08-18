@@ -16,12 +16,12 @@ const navLinks = [
 
 const myUnitedSubLinks = [
   { to: '/dashboard', label: 'Dashboard', hasSub: false },
-  { to: '/matches', label: 'Match Day Log', hasSub: true },
-  { to: '/statistics', label: 'Fan Statistics', hasSub: false },
-  { to: '/leaderboards', label: 'Red Leaderboard', hasSub: true },
-  { to: '/cards', label: 'Story Cards Archive', hasSub: true },
-  { to: '/profile', label: 'Supporter Profile', hasSub: false },
-  { to: '/preferences', label: 'Account Settings', hasSub: false },
+  { to: '/matches', label: 'Match Log', hasSub: true },
+  { to: '/statistics', label: 'Statistics', hasSub: false },
+  { to: '/leaderboards', label: 'Leaderboards', hasSub: true },
+  { to: '/badges', label: 'Badges', hasSub: false },
+  { to: '/wrapped', label: 'Season Wrapped', hasSub: false },
+  { to: '/cards', label: 'Story Cards', hasSub: true },
 ]
 
 export const Header = () => {

@@ -17,7 +17,6 @@ interface LeaderboardUser {
   wins: number
   badges_count: number
   total_kits: number
-  total_spend: number
   total_miles: number
 }
 
@@ -34,7 +33,6 @@ const categories: Category[] = [
   { id: 'in_person', label: 'In Person', unit: 'grounds' },
   { id: 'wins', label: 'Wins', unit: 'wins' },
   { id: 'kits', label: 'Kit Collector', unit: '👕' },
-  { id: 'spend', label: 'Derby Day Spender', unit: '£' },
   { id: 'miles', label: 'Red Mile', unit: 'mi' },
 ]
 
@@ -46,7 +44,6 @@ function categoryValue(user: LeaderboardUser, categoryId: string): number {
     case 'in_person': return user.total_in_person
     case 'wins': return user.wins
     case 'kits': return user.total_kits || 0
-    case 'spend': return user.total_spend || 0
     case 'miles': return user.total_miles || 0
     default: return 0
   }
@@ -54,7 +51,6 @@ function categoryValue(user: LeaderboardUser, categoryId: string): number {
 
 function categoryDisplayValue(user: LeaderboardUser, categoryId: string): string {
   const val = categoryValue(user, categoryId)
-  if (categoryId === 'spend') return `£${val.toLocaleString()}`
   if (categoryId === 'miles') return `${val.toLocaleString()}`
   if (categoryId === 'kits') return `${val}`
   if (categoryId === 'streak') return `${val}`
@@ -68,7 +64,6 @@ function podiumAccent(rank: number): string {
   return 'bg-united-gray-200'
 }
 
-// Helper to get the query key for a category
 const getLeaderboardKey = (category: string, page: number, view: string) => 
   ['leaderboards', category, page, view]
 
@@ -79,25 +74,22 @@ export const Leaderboards = () => {
   const limit = 20
   const queryClient = useQueryClient()
 
-  // Prefetch all categories in the background
   useEffect(() => {
     const prefetchAllCategories = async () => {
-      // Get all categories except the current one (already loading)
       const categoriesToPrefetch = categories
         .map(c => c.id)
         .filter(id => id !== selectedCategory)
 
-      // Prefetch each category
       for (const categoryId of categoriesToPrefetch) {
         await queryClient.prefetchQuery({
           queryKey: getLeaderboardKey(categoryId, currentPage, view),
           queryFn: async () => {
-            const response = await apiClient.get('/leaderboards', {
+            const response = await apiClient.get('/leaderboards/', {
               params: { category: categoryId, page: currentPage, limit },
             })
             return response.data
           },
-          staleTime: 60000, // 1 minute
+          staleTime: 60000,
         })
       }
     }
@@ -105,16 +97,15 @@ export const Leaderboards = () => {
     prefetchAllCategories()
   }, [currentPage, view, selectedCategory, queryClient, limit])
 
-  // Main query for current category
   const { data: leaderboardData, isLoading, refetch } = useQuery({
     queryKey: getLeaderboardKey(selectedCategory, currentPage, view),
     queryFn: async () => {
-      const response = await apiClient.get('/leaderboards', {
+      const response = await apiClient.get('/leaderboards/', {
         params: { category: selectedCategory, page: currentPage, limit },
       })
       return response.data
     },
-    staleTime: 60000, // 1 minute
+    staleTime: 60000,
   })
 
   const { data: myRank } = useQuery({
@@ -141,10 +132,8 @@ export const Leaderboards = () => {
   const totalPages = Math.ceil((leaderboardData?.total || 0) / limit)
   const activeCategory = categories.find((c) => c.id === selectedCategory)!
 
-  // Check if data is loading (only show spinner on initial load)
   const isInitialLoading = isLoading && !leaderboardData
 
-  // Handle category change - instant switch using cached data
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId)
     setCurrentPage(1)
@@ -220,7 +209,6 @@ export const Leaderboards = () => {
         <div className="flex gap-7 border-b border-united-gray-200 mb-8 overflow-x-auto">
           {categories.map((cat) => {
             const isActive = selectedCategory === cat.id
-            // Check if this category is cached (for visual feedback)
             const isCached = queryClient.getQueryData(
               getLeaderboardKey(cat.id, currentPage, view)
             )

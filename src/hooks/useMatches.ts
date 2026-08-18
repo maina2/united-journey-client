@@ -104,14 +104,15 @@ export const useBulkImportMatches = () => {
   })
 }
 
+// Upcoming windows hooks
 export const useUpcomingWindows = () => {
   return useQuery({
     queryKey: ['matches', 'upcoming-windows'],
     queryFn: async () => {
       const response = await matchesApi.getUpcomingWindows()
-      return response.data
+      return Array.isArray(response.data) ? response.data : []
     },
-    staleTime: 30 * 1000, // Refresh every 30 seconds
+    staleTime: 30 * 1000,
     refetchInterval: 30000,
   })
 }
