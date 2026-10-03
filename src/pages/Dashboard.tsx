@@ -5,7 +5,7 @@ import { LoadingSpinner } from '../components/common/LoadingSpinner'
 import { BadgesCarousel } from '../components/dashboard/BadgesCarousel'
 import { RankDisplay } from '../components/dashboard/RankDisplay'
 import { UpcomingMatches } from '../components/dashboard/UpcomingMatches'
-import { formatDistanceToNow } from 'date-fns'
+import { formatDistanceToNow, format } from 'date-fns'
 import {
   TrophyIcon,
   CalendarDaysIcon,
@@ -205,72 +205,132 @@ export const Dashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Recent Matches */}
-          <div className="lg:col-span-2 rounded-2xl border border-united-gray-200 bg-united-white p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-serif text-xl text-united-black">Recent Appearances</h2>
+          {/* Recent Appearances – redesigned */}
+          <div className="lg:col-span-2 rounded-2xl border border-united-gray-200 bg-united-white overflow-hidden">
+            {/* Card header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-united-gray-100 bg-united-black">
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-1 bg-united-red rounded-full" />
+                <h2 className="font-serif text-lg text-united-white tracking-wide">
+                  Recent Appearances
+                </h2>
+              </div>
               {recentMatches.length > 0 && (
-                <span className="text-sm font-mono tracking-wider text-united-gray-500">
-                  {recentMatches.slice(0, 5).map(m => m.result === 'W' ? '✅' : m.result === 'D' ? '➖' : '❌').join(' ')}
-                </span>
+                <div className="flex items-center gap-1.5">
+                  {recentMatches.slice(0, 5).map((m: any, i: number) => (
+                    <span
+                      key={i}
+                      className={`h-2.5 w-2.5 rounded-full ${
+                        m.result === 'W'
+                          ? 'bg-emerald-400'
+                          : m.result === 'D'
+                          ? 'bg-amber-400'
+                          : 'bg-united-red'
+                      }`}
+                      title={m.result}
+                    />
+                  ))}
+                </div>
               )}
             </div>
-            <div className="h-px w-full bg-united-gray-200 mb-4" />
+
             {caps === 0 ? (
-              <div className="py-10 text-center">
-                <p className="font-medium text-united-black">No appearances logged yet.</p>
-                <p className="text-sm text-united-gray-600 mt-1">Log a match to start your record.</p>
+              <div className="py-14 text-center px-6">
+                <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-united-black/5 flex items-center justify-center">
+                  <CalendarDaysIcon className="h-6 w-6 text-united-gray-400" />
+                </div>
+                <p className="font-serif text-lg text-united-black">No appearances logged yet</p>
+                <p className="text-sm text-united-gray-500 mt-1">
+                  Log a match to start your record.
+                </p>
+                <Link
+                  to="/matches"
+                  className="inline-flex mt-5 items-center gap-2 rounded-lg bg-united-red px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700 transition-colors"
+                >
+                  <PlusIcon className="h-4 w-4" />
+                  Log your first match
+                </Link>
               </div>
             ) : recentMatches.length === 0 ? (
-              <div className="py-10 text-center">
+              <div className="py-14 text-center">
                 <p className="text-united-gray-500">No recent matches found.</p>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="divide-y divide-united-gray-100">
                 {recentMatches.map((match: any) => {
-                  const resultColor = match.result === 'W' ? 'text-emerald-600 bg-emerald-50' 
-                    : match.result === 'D' ? 'text-amber-600 bg-amber-50' 
-                    : 'text-red-600 bg-red-50'
+                  const isWin = match.result === 'W'
+                  const isDraw = match.result === 'D'
+                  const resultBg = isWin
+                    ? 'bg-emerald-500'
+                    : isDraw
+                    ? 'bg-amber-500'
+                    : 'bg-united-red'
+                  const resultLabel = match.result || '—'
+
                   return (
                     <Link
                       key={match.id}
                       to={`/matches/${match.id}`}
-                      className="flex items-center justify-between p-3 rounded-xl hover:bg-united-gray-50 transition-colors group"
+                      className="group flex items-center gap-4 px-5 py-4 hover:bg-united-gray-50 transition-colors"
                     >
-                      <div className="flex items-center gap-3">
-                        <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${resultColor}`}>
-                          {match.result || '—'}
+                      {/* Result badge */}
+                      <div
+                        className={`shrink-0 h-11 w-11 rounded-xl ${resultBg} flex items-center justify-center shadow-sm`}
+                      >
+                        <span className="text-sm font-bold text-white tracking-wide">
+                          {resultLabel}
                         </span>
-                        <div>
-                          <p className="font-semibold text-united-black">{match.opponent}</p>
-                          <p className="text-xs text-united-gray-500">
-                            {match.competition} • {match.venue}
-                          </p>
-                        </div>
                       </div>
-                      <div className="text-right">
-                        {match.score_home !== null ? (
-                          <p className="font-bold text-united-black">
-                            {match.is_home ? match.score_home : match.score_away} - {match.is_home ? match.score_away : match.score_home}
+
+                      {/* Match info */}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-united-black truncate group-hover:text-united-red transition-colors">
+                            {match.is_home ? 'vs' : '@'} {match.opponent}
+                          </p>
+                          {match.attendance_type === 'in_person' && (
+                            <span className="shrink-0 text-[10px] font-bold tracking-wider uppercase bg-united-black text-united-white px-1.5 py-0.5 rounded">
+                              In Person
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-united-gray-500 mt-0.5 truncate">
+                          {match.competition}
+                          {match.venue ? ` · ${match.venue}` : ''}
+                        </p>
+                      </div>
+
+                      {/* Score + date */}
+                      <div className="shrink-0 text-right">
+                        {match.score_home !== null && match.score_away !== null ? (
+                          <p className="font-mono text-base font-bold text-united-black tabular-nums">
+                            {match.is_home
+                              ? `${match.score_home} – ${match.score_away}`
+                              : `${match.score_away} – ${match.score_home}`}
                           </p>
                         ) : (
                           <p className="text-xs text-united-gray-400">No score</p>
                         )}
-                        <p className="text-[10px] text-united-gray-400">
-                          {formatDistanceToNow(new Date(match.match_date), { addSuffix: true })}
+                        <p className="text-[11px] text-united-gray-400 mt-0.5">
+                          {format(new Date(match.match_date), 'dd MMM yyyy')}
                         </p>
                       </div>
                     </Link>
                   )
                 })}
-                {caps > 5 && (
-                  <Link
-                    to="/matches"
-                    className="block text-center text-sm font-medium text-united-red hover:underline mt-4"
-                  >
-                    View all {caps} matches →
-                  </Link>
-                )}
+              </div>
+            )}
+
+            {/* Footer link */}
+            {caps > 5 && (
+              <div className="border-t border-united-gray-100 px-5 py-3.5 bg-united-gray-50/60">
+                <Link
+                  to="/matches"
+                  className="flex items-center justify-center gap-1.5 text-sm font-semibold text-united-red hover:text-red-700 transition-colors"
+                >
+                  View all {caps} matches
+                  <span className="text-base leading-none">→</span>
+                </Link>
               </div>
             )}
           </div>

@@ -37,6 +37,7 @@ export const matchesApi = {
       current_streak: number
       longest_streak: number
       total_points: number
+      miles_travelled?: number
     }>('/matches/stats'),
 
   getFixtures: (season?: string) => 
@@ -47,7 +48,8 @@ export const matchesApi = {
       '/matches/bulk', 
       { matches }
     ),
-     getUpcomingWindows: () =>
+
+  getUpcomingWindows: () =>
     apiClient.get<Array<{
       id: number
       match_date: string
@@ -80,7 +82,5 @@ export const matchesApi = {
   logAttendance: (fixtureId: number, attendance_type: 'in_person' | 'watched', notes?: string) =>
     apiClient.post<Match>(
       `/matches/fixtures/${fixtureId}/log-attendance?attendance_type=${attendance_type}${notes ? `&notes=${notes}` : ''}`
-    )
+    ),
 }
-
- 

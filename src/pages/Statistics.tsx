@@ -6,6 +6,7 @@ import {
   usePointsHistory,
 } from '../hooks/useStatistics'
 import { useMyBadges } from '../hooks/useBadges'
+import { useMatchStats } from '../hooks/useMatches'
 import { LoadingSpinner } from '../components/common/LoadingSpinner'
 import {
   LineChart,
@@ -24,45 +25,46 @@ const BRAND_CYCLE = ['#DA291C', '#C9A227', '#0C3B2E', '#1A1A1A', '#A31E17']
 
 export const Statistics = () => {
   const { data: dashboard, isLoading: dashboardLoading } = useDashboardStats()
+  const { data: matchStats, isLoading: matchStatsLoading } = useMatchStats()
   const { data: seasons, isLoading: seasonsLoading } = useSeasonBreakdown()
   const { data: streakData, isLoading: streakLoading } = useStreakTimeline()
   const { data: performanceData, isLoading: performanceLoading } = usePerformanceTimeline()
   const { data: pointsData, isLoading: pointsLoading } = usePointsHistory()
-  const { data: badgesData } = useMyBadges()
+  const { data: badgesData, isLoading: badgesLoading } = useMyBadges()
 
-  const isLoading = dashboardLoading || seasonsLoading || streakLoading || performanceLoading || pointsLoading
+  const isLoading =
+    dashboardLoading ||
+    matchStatsLoading ||
+    seasonsLoading ||
+    streakLoading ||
+    performanceLoading ||
+    pointsLoading ||
+    badgesLoading
 
   if (isLoading) {
     return <LoadingSpinner />
   }
 
-  if (!dashboard) {
-    return (
-      <div className="max-w-5xl mx-auto px-4 py-20 text-center">
-        <p className="font-serif text-xl text-united-black mb-1">No statistics yet.</p>
-        <p className="text-united-gray-600">Log some matches to see your season take shape.</p>
-      </div>
-    )
-  }
-
-  const competitionData = dashboard.competition_breakdown || []
+  // Data is now available
+  const competitionData = dashboard?.competition_breakdown || []
   const competitionTotal = competitionData.reduce((sum, c) => sum + c.count, 0)
   const earnedBadges = badgesData?.earned || []
 
-  // Use dashboard data directly
-  const stats = [
-    { label: 'Matches', value: dashboard.total_matches || 0 },
-    { label: 'Win Rate', value: `${dashboard.win_percentage || 0}%`, accent: 'text-emerald-400' },
-    { label: 'Streak', value: dashboard.current_streak || 0, accent: 'text-united-foil' },
-    { label: 'Points', value: dashboard.total_points || 0, accent: 'text-united-foil' },
-    { label: 'In Person', value: dashboard.in_person || 0 },
-    { label: 'Grounds', value: dashboard.grounds_visited || 0, accent: 'text-emerald-400' },
-    { label: 'Badges', value: earnedBadges.length || 0, accent: 'text-united-foil' },
-    { label: 'Miles', value: `${dashboard.miles_travelled || 0}`, accent: 'text-united-foil' },
-  ]
+  // Prefer matchStats, fall back to dashboard for resilience
+  const totalMatches = matchStats?.total_matches ?? dashboard?.total_matches ?? 0
+  const winPercentage = matchStats?.win_percentage ?? dashboard?.win_percentage ?? 0
+  const currentStreak = matchStats?.current_streak ?? dashboard?.current_streak ?? 0
+  const totalPoints = matchStats?.total_points ?? dashboard?.total_points ?? 0
+  const inPerson = matchStats?.in_person ?? dashboard?.in_person ?? 0
+  const groundsVisited = matchStats?.grounds_visited ?? dashboard?.grounds_visited ?? 0
+  const wins = matchStats?.wins ?? dashboard?.wins ?? 0
+  const draws = matchStats?.draws ?? dashboard?.draws ?? 0
+  const losses = matchStats?.losses ?? dashboard?.losses ?? 0
+  const milesTravelled = dashboard?.miles_travelled ?? 0
 
   return (
     <div>
+      {/* Masthead */}
       <section className="relative overflow-hidden bg-united-black">
         <div
           className="pointer-events-none absolute inset-0 opacity-60"
@@ -83,21 +85,31 @@ export const Statistics = () => {
           <p className="mt-2 text-united-white/50">Your United journey, visualized.</p>
 
           <div className="mt-10 grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-united-white/10 border-t border-united-white/10 pt-6">
-            {stats.map((stat) => (
-              <HeroStat key={stat.label} label={stat.label} value={stat.value} accent={stat.accent || 'text-united-white'} />
-            ))}
+            <HeroStat label="Matches" value={totalMatches} />
+            <HeroStat label="Win Rate" value={`${winPercentage}%`} accent="text-emerald-400" />
+            <HeroStat label="Streak" value={currentStreak} accent="text-united-gold" />
+            <HeroStat label="Points" value={totalPoints} accent="text-united-gold" />
+            <HeroStat label="In Person" value={inPerson} />
+            <HeroStat label="Grounds" value={groundsVisited} accent="text-emerald-400" />
+            <HeroStat label="Badges" value={earnedBadges.length} accent="text-united-gold" />
+            <HeroStat label="Miles" value={`${milesTravelled || 0}`} />
           </div>
         </div>
       </section>
 
+      {/* Pull-quote */}
       <div className="max-w-5xl mx-auto px-4 md:px-8 py-14 border-b border-united-gray-200">
         <p className="font-serif text-2xl md:text-3xl text-united-black leading-snug">
-          You&rsquo;re on a <span className="text-united-red font-bold">{dashboard.current_streak || 0}-match</span> run,
-          holding a <span className="text-united-pitch font-bold">{dashboard.win_percentage || 0}%</span> win rate
-          across <span className="font-bold">{dashboard.total_matches || 0}</span> matches logged this season.
+          You&rsquo;re on a <span className="text-united-red font-bold">{currentStreak}-match</span> run,
+          holding a <span className="text-united-pitch font-bold">{winPercentage}%</span> win rate
+          across <span className="font-bold">{totalMatches}</span> matches logged this season.
+          <span className="block text-base text-united-gray-500 mt-2 font-sans">
+            {wins}W – {draws}D – {losses}L
+          </span>
         </p>
       </div>
 
+      {/* Charts */}
       <div className="max-w-5xl mx-auto px-4 md:px-8 py-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 rounded-2xl bg-united-charcoal p-6">
           <h3 className="font-serif text-lg text-united-white mb-4">Points Accumulation</h3>

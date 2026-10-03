@@ -14,6 +14,7 @@ export interface WrappedStats {
   total_miles: number
   current_streak: number
   longest_streak: number
+  total_kits: number
 }
 
 export interface WrappedData {
@@ -22,9 +23,12 @@ export interface WrappedData {
     username: string
     full_name: string | null
     avatar_url: string | null
+    country: string | null
+    member_since: string | null
   }
   stats: WrappedStats
   top_opponents: Array<{ opponent: string; count: number }>
+  most_faced_opponent: { opponent: string; count: number } | null
   favorite_match: {
     opponent: string
     date: string
@@ -44,7 +48,16 @@ export interface WrappedData {
     name: string
     color: string
     icon_url: string | null
+    description: string
   } | null
+  rank: {
+    global_rank: number | null
+    total_users: number
+    country_rank: number | null
+    country: string | null
+  }
+  highlights: string[]
+  summary: string
   share_id: string
   generated_at: string
 }
@@ -54,6 +67,7 @@ export interface WrappedResponse {
   share_id: string
   season: string
   data: WrappedData
+  summary: string
 }
 
 export interface WrappedHistoryItem {
@@ -63,6 +77,7 @@ export interface WrappedHistoryItem {
   total_matches: number
   total_points: number
   generated_at: string
+  data: WrappedData | null
 }
 
 export const wrappedApi = {
